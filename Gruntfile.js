@@ -15,10 +15,10 @@ module.exports = function(grunt) {
 	//jshint
 	Config.jshint = {
 		options: {
-			jshintrc: '.jshintrc'
+			jshintrc: '.jshintrc' 
 		},
 		packages: [
-			'Gruntfile.js','package.json'
+			'Gruntfile.js','package.json','.gitftppass'
 		],javascript:[
 			'tasks/git_ftp.js'
 		]    
@@ -30,11 +30,11 @@ module.exports = function(grunt) {
 			livereload: false
 		},  
 		javascript: {
-			files: ['tasks/git_ftp.js'],
+			files: ['tasks/git_ftp.js','.gitftppass'],
 			tasks: ['jshint:javascript']
 		}
 	};
-
+ 
 	//git_ftp
 	Config.git_ftp = {
 		default_options: {
@@ -60,7 +60,7 @@ module.exports = function(grunt) {
 
 	//Register the test tasks
 	grunt.registerTask('test', [
-		'jshint:javascript'
+		'jshint:javascript','git_ftp'
 	]);
 
 };
