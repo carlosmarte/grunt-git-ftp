@@ -1,0 +1,51 @@
+{
+  "name": "grunt-git-ftp",
+  "description": "ftp your last commit",
+  "version": "0.1.0",
+  "homepage": "https://github.com/robertomarte/grunt-git-ftp",
+  "author": {
+    "name": "Roberto Carlos Marte",
+    "email": "app@carlosmarte.me",
+    "url": "http://carlosmarte.me"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/robertomarte/grunt-git-ftp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/robertomarte/grunt-git-ftp/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/robertomarte/grunt-git-ftp/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "Gruntfile.js",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {
+    "ftp": "~0.3.1",
+    "grunt": "~0.4.1",
+    "string": "~1.4.0"
+  }, 
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-nodeunit": "~0.1.2",
+    "grunt-contrib-copy":"~0.4.1",
+    "grunt-contrib-watch":"~0.4.4"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.1",
+    "ftp":"~0.3.1",
+    "string": "~1.4.0"
+  },
+  "keywords": [
+    "gruntplugin","git","ftp","commit"
+  ]
+}
