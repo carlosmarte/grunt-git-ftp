@@ -38,15 +38,9 @@ module.exports = function(grunt) {
 	//git_ftp
 	Config.git_ftp = {
 		default_options: {
-			options: {
-
-			},
-			files: {
-				'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123'],
-			},
+			
 		}
     };
-
 
 	//Init Task
 	grunt.initConfig(Config);
@@ -56,11 +50,8 @@ module.exports = function(grunt) {
 
 	// These plugins provide necessary tasks.
 	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-nodeunit');
-	grunt.loadNpmTasks('grunt-contrib-copy');
-	//grunt.loadNpmTasks('grunt-neuter');    
-	grunt.loadNpmTasks('grunt-contrib-watch');  
-
+	grunt.loadNpmTasks('grunt-contrib-nodeunit');   
+	grunt.loadNpmTasks('grunt-contrib-watch'); 
 
 	//Register the default tasks
 	grunt.registerTask('default',[
