@@ -127,9 +127,10 @@ module.exports = function(grunt){
   * Create Remote Directory
   */  
   Grunt_git_ftp_class.prototype.create_remote_directory = function(list,cb){
-    if(list.length){ 
-        async.forEach(list,function(dir, next_array){
-          ftp.mkdir('domains/project-v4.carlosmarte.me/git/tasks/',true,function(err){             
+    var remote_root_path = App.ftp('remote_path');     
+    if(Object.keys(list).length){ 
+        async.forEach(Object.keys(list),function(dir, next_array){
+          ftp.mkdir(dir,true,function(err){             
             log.ok('created remote directory: ' + dir);
             next_array();           
           });
