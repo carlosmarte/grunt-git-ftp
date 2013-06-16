@@ -1,6 +1,6 @@
 {
   "name": "grunt-git-ftp",
-  "description": "ftp your last commit",
+  "description": "queries last git commit and FTPs modified files to server",
   "version": "0.1.0",
   "homepage": "https://github.com/robertomarte/grunt-git-ftp",
   "author": {
