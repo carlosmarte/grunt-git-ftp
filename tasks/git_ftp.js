@@ -9,15 +9,17 @@
 'use strict';
 
 module.exports = function(grunt){
-  //Extend Array Class
-  Array.prototype.clean = function(deleteValue) {
-      for (var i = 0; i < this.length; i++) {
-          if (this[i] === deleteValue) {         
-              this.splice(i, 1);
-              i--;
-          }
-      }
-      return this;
+ //Extend array function, remove matching values from array
+  Array.prototype.remove = function(delete_matching_values){
+    var index = null; //store array index
+    //while loop through indexOf(delete_matching_values) values
+    do{
+      index = this.indexOf(delete_matching_values); //return index of matching value
+      if(index > 0){  //if index if gt 0 remove
+        this.splice(index, 1); //remove values from array
+      }      
+    } while(index > 0);
+    return this;
   }; 
 
   grunt.util = grunt.util || grunt.utils;  
@@ -52,7 +54,9 @@ module.exports = function(grunt){
         this.host_config = grunt.file.readJSON(filename); 
         this.host_config._key = host_name;
         this.revision_number = null;
-        this.done = null;
+        this.done = null,
+        this.local_directories = {},
+        this.local_files = null;
       }else{
         log.error('Error, please check {' + host_name.red + '} or json file format');
       }
@@ -76,46 +80,84 @@ module.exports = function(grunt){
   * Command function
   */  
   Grunt_git_ftp_class.prototype.cmd = function(command,cb,err){
-    cmd(command,function(error, stdout, stderr){ 
-      console.log(stdout.split(/\n/));        
-        if(!error){
-          cb(stdout);
-        }else{
-          err(error);
-        }
-    });
+    this.commands(false,command,cb,err);
   }; 
 
  /*
   * Command function
   */  
   Grunt_git_ftp_class.prototype.cmd_split = function(split,command,cb,err){
+    this.commands(split,command,cb,err);
+  }; 
+
+ /*
+  * Command function
+  */  
+  Grunt_git_ftp_class.prototype.commands = function(should_split,command,cb,err){
     cmd(command,function(error, stdout, stderr){ 
-      console.log(stdout);        
+        var temp = null;     
         if(!error){
-          cb(stdout.split(/\n/));
+          if(should_split === false){
+            cb(stdout);
+          }else{
+            temp = stdout.split(should_split).remove('');
+            cb(temp);
+          }          
         }else{
           err(error);
         }
     });
   };
 
-
  /*
-  * Command function
+  * report errors
   */  
   Grunt_git_ftp_class.prototype.git_cmd_err = function(err){  
     log.error(err);
     done(); 
   };  
 
- /*
-  * take command output and return array of directories/files
+  /*
+  * Create Remote Directory
   */  
-  Grunt_git_ftp_class.prototype.extract_git_listing = function(list){
-    var temp = typeof(list.split(/\n/));
-    return temp; //String(list).split(/\n/);
+  Grunt_git_ftp_class.prototype.create_remote_directory = function(list,cb){
+    if(list.length){ 
+        async.forEach(list,function(dir, next_array){
+          ftp.mkdir('domains/project-v4.carlosmarte.me/git/tasks/',true,function(err){             
+            log.ok('created remote directory: ' + dir);
+            next_array();           
+          });
+        },function(err){
+          cb(null);
+        });
+    }else{
+      cb(true,'error while creating directory');
+    }
+  };
 
+  /*
+  * Upload local file to server
+  */ 
+  Grunt_git_ftp_class.prototype.upload_files = function(list,cb){
+    var remote_root_path = App.ftp('remote_path'),
+    host = App.ftp('host');
+    if(list.length){ 
+        async.forEach(list,function(filepath, next_array){
+          ftp.put(grunt_root_path + '/' + filepath,path.normalize(remote_root_path + '/' + filepath),function(err){
+            if(err){
+              cb(true,err);
+              throw err; 
+            }      
+            log.ok('Uploaded from: ' + filepath + ' >> ' + host.blue + '@' + path.normalize(remote_root_path + '/' + filepath).green);     
+            ftp.end();
+            next_array();
+          }); 
+        },function(err){
+          cb(null);
+        });
+    }else{
+      cb(true,'error while uploading file');
+    }
   };
 
   App = new Grunt_git_ftp_class();
@@ -146,11 +188,11 @@ module.exports = function(grunt){
 
     //FTP is ready
     ftp.on('ready',function(){
-        log.ok('Connected to ftp host: ' + App.ftp('host').green);
+        log.ok('Connected to ftp host: ' + App.ftp('host').blue + ' | root: ' + App.ftp('remote_path').blue );
 
         //callbacks
         grunt.util.async.waterfall([
-            function(callback){
+            function(callback){ //handles git commands
               //get last commited revision number
               App.cmd('git rev-parse --verify HEAD',function(output){
                 //revision_number trim and toString
@@ -160,13 +202,13 @@ module.exports = function(grunt){
                   //notify user
                   log.ok('git last commit HASH: ' + App.revision_number.blue);
                   //get list of commited files/directories
-                  App.cmd('git diff-tree --no-commit-id --name-only -r ' + App.revision_number,function(output){  
+                  App.cmd_split(/\n/,'git diff-tree --no-commit-id --name-only -r ' + App.revision_number,function(output){  
                     //check output length
                     if(output.length !== 0){
                       //Get List of commited items
-                      App.last_commited_items = App.extract_git_listing(output); //App.extract_git_listing(str(output).toString());               
+                      App.last_commited_items = output;              
                       //next callback
-                      callback(null,App.extract_git_listing(App.last_commited_items)); 
+                      callback(null,App.last_commited_items); 
                     }else{
                       log.error('Error while getting Git Commited items');
                       callback(true);
@@ -177,18 +219,39 @@ module.exports = function(grunt){
                   callback(true);
                 }
               },App.git_cmd_err);
-            },function(arg_last_commited,callback){ 
-            
+            },function(arg_last_commited,callback){ //handles filtering files/directories
+              var relative_path = null,
+              remote_root_path = App.ftp('remote_path'); //get remote path from .gitftppass   
 
-            console.log(arg_last_commited);               
-              callback(null,1);                
+              if(remote_root_path.length === 0){
+                log.error('Error, please check {remote path} in .gitftppass');
+                return callback(true);
+              }  
+
+              //filter array and return remote filepath
+              App.local_files = arg_last_commited.filter(function(filepath){
+                if(fs.existsSync(grunt_root_path + '/' + filepath)){ 
+                  //store directory as a key(path) value(successfully uploaded)
+                  App.local_directories[path.normalize(path.dirname(remote_root_path + '/' + filepath) + '/')] = null;
+                  //only return file OR files that start with (.)
+                  return (path.extname(filepath) || filepath[0] === '.' ? true : false);
+                }else{
+                  return false;
+                }
+              });               
+              callback(null,App);                
+            },function(IO,callback){ //handles filtering files/directories
+              //Create Remote Directories
+              App.create_remote_directory(IO.local_directories,function(){
+                App.upload_files(IO.local_files,function(){
+                  callback(null,'Successfully uploaded ' + String(IO.local_files.length).blue + ' files from last committed id:' + App.revision_number.blue);
+                });                
+              });             
             }],function(err,result){ //Completed
-              console.log(result);
+              log.ok(result);
               done();               
             }
         );           
     });     
   });
 };
-
-
