@@ -16,7 +16,6 @@ npm-debug.log
 
 node_modules/
 .gitattributes
-.jshintrc
 .npmignore
 .DS_Store
 .gitignore
