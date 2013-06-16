@@ -207,19 +207,41 @@ module.exports = function(grunt){
                 if(App.revision_number.length !== 0){
                   //notify user
                   log.ok('git last commit HASH: ' + App.revision_number.blue);
-                  //get list of commited files/directories
-                  App.cmd_split(/\n/,'git diff-tree --no-commit-id --name-only -r ' + App.revision_number,function(output){  
-                    //check output length
-                    if(output.length !== 0){
-                      //Get List of commited items
-                      App.last_commited_items = output;              
-                      //next callback
-                      callback(null,App.last_commited_items); 
-                    }else{
-                      log.error('Error while getting Git Commited items');
-                      callback(true);
+
+                  App.cmd("git log --pretty=format:'%h' | wc -l",function(output){
+                    var total_revisions = parseInt(output,16);
+                    //if first commit upload all files
+                    if(total_revisions === 0){
+                      //get list of commited files/directories
+                      App.cmd_split(/\n/,'git show --pretty="format:" --name-only ' + App.revision_number,function(output){  
+                        //check output length
+                        if(output.length !== 0){
+                          //Get List of commited items
+                          App.last_commited_items = output;              
+                          //next callback
+                          callback(null,App.last_commited_items); 
+                        }else{
+                          log.error('Error while getting Git Commited items');
+                          callback(true);
+                        }
+                      },App.git_cmd_err); 
+                    }else{ //else only upload changes files
+                      //get list of commited files/directories
+                      App.cmd_split(/\n/,'git diff-tree --no-commit-id --name-only -r ' + App.revision_number,function(output){  
+                        //check output length
+                        if(output.length !== 0){
+                          //Get List of commited items
+                          App.last_commited_items = output;              
+                          //next callback
+                          callback(null,App.last_commited_items); 
+                        }else{
+                          log.error('Error while getting Git Commited items');
+                          callback(true);
+                        }
+                      },App.git_cmd_err); 
                     }
-                  },App.git_cmd_err);               
+                  });
+
                 }else{
                   log.error('Error while getting Git Commit Hash');
                   callback(true);
