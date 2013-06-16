@@ -61,7 +61,7 @@ module.exports = function(grunt){
         log.error('Error, please check {' + host_name.red + '} or json file format');
       }
     }else{
-        log.error('Error, json file not found:' + filename.red);
+        log.error('Error, ftp setting file not found in : ' + filename.red);
     }    
     return this.host_config;
   };  
@@ -113,7 +113,13 @@ module.exports = function(grunt){
   * report errors
   */  
   Grunt_git_ftp_class.prototype.git_cmd_err = function(err){  
-    log.error(err);
+    if(err.toString().indexOf('Needed a single revision')){
+     log.error('Git Needed a single revision, please run'.red);
+     log.ok('git add .'.red);
+     log.ok('git commit -m "your message goes here"'.red);
+    }else{
+     log.error(err);
+    }
     done(); 
   };  
 
