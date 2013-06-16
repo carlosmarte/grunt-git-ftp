@@ -24,24 +24,6 @@ module.exports = function(grunt) {
 		]    
 	};
 
-	//watch
-	Config.watch = {
-		options: {
-			livereload: false
-		},  
-		javascript: {
-			files: ['tasks/git_ftp.js','.gitftppass'],
-			tasks: ['jshint:javascript']
-		}
-	};
- 
-	//git_ftp
-	Config.git_ftp = {
-		default_options: {
-			
-		}
-    };
-
 	//Init Task
 	grunt.initConfig(Config);
 
@@ -50,17 +32,9 @@ module.exports = function(grunt) {
 
 	// These plugins provide necessary tasks.
 	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-nodeunit');   
-	grunt.loadNpmTasks('grunt-contrib-watch'); 
 
 	//Register the default tasks
 	grunt.registerTask('default',[
 		'jshint:packages'
 	]);
-
-	//Register the test tasks
-	grunt.registerTask('test', [
-		'jshint:javascript','git_ftp'
-	]);
-
 };

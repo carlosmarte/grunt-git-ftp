@@ -33,7 +33,6 @@ module.exports = function(grunt){
   Ftp_client = require('ftp'),
   cmd = require("child_process").exec,
   grunt_root_path = process.cwd(),
-  str = require('string'),
   ftp = new Ftp_client(),
   remote_directories = [],
   done = null,
@@ -203,7 +202,7 @@ module.exports = function(grunt){
               //get last commited revision number
               App.cmd('git rev-parse --verify HEAD',function(output){
                 //revision_number trim and toString
-                App.revision_number = str(output).toString(); 
+                App.revision_number = output.toString(); 
                 //check string length
                 if(App.revision_number.length !== 0){
                   //notify user
