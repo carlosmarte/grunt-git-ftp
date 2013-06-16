@@ -44,5 +44,6 @@ git_ftp: {
 ---
 
 Task submitted by [Roberto Carlos Marte](http://Carlosmarte.me/)
+NPM Package grunt-git-ftp(https://npmjs.org/package/grunt-git-ftp)
 
 *This file was generated on Sun Jun 15 2013 11:00:31.*
