@@ -40,7 +40,7 @@ module.exports = function(grunt){
     this.host_config = null;
  
     return this;
-  },App = null; 
+  }; 
 
  /*
   * Get host file and parse json
@@ -60,7 +60,7 @@ module.exports = function(grunt){
         log.error('Error, please check {' + host_name.red + '} or json file format');
       }
     }else{
-        log.error('Error, ftp setting file not found in : ' + filename.red);
+        log.error('Error, ftp configuration file not found in : ' + grunt_root_path + '/' + filename.red);
     }    
     return this.host_config;
   };  
@@ -69,28 +69,44 @@ module.exports = function(grunt){
   * Get/Set FTP Key Values
   */  
   Grunt_git_ftp_class.prototype.ftp = function(key,val){  
+    //if key isn't 
+    if(this.host_config._key === undefined || typeof(this.host_config[this.host_config._key]) !== 'object'){
+      log.error('Error, please check that { \n' + 
+      ' "'+ this.host_config._key.red +'": {  \n' + 
+      '  "host": "ftp.host-address.com",  \n' + 
+      '    "port": 21,  \n' + 
+      '    "user": "ftp-username",  \n' + 
+      '    "password": "ftp-account-password",  \n' + 
+      '    "remote_path": "ftp-basepath"  \n' + 
+      '  }  \n' + 
+      '} exist your ftp configuration file');
+      throw 'key not found in .gitftppass'; 
+    }
+
+    //get host config key
     if(arguments.length === 2){
       this.host_config[this.host_config._key][key] = val;
     }
+
     return (this.host_config[this.host_config._key][key] ? this.host_config[this.host_config._key][key] : null);
   };  
 
  /*
-  * Command function
+  * Command function return string
   */  
   Grunt_git_ftp_class.prototype.cmd = function(command,cb,err){
     this.commands(false,command,cb,err);
   }; 
 
  /*
-  * Command function
+  * Command function return array
   */  
   Grunt_git_ftp_class.prototype.cmd_split = function(split,command,cb,err){
     this.commands(split,command,cb,err);
   }; 
 
  /*
-  * Command function
+  * Command wrapper function
   */  
   Grunt_git_ftp_class.prototype.commands = function(should_split,command,cb,err){
     cmd(command,function(error, stdout, stderr){ 
@@ -126,7 +142,7 @@ module.exports = function(grunt){
   * Create Remote Directory
   */  
   Grunt_git_ftp_class.prototype.create_remote_directory = function(list,cb){
-    var remote_root_path = App.ftp('remote_path');     
+    var remote_root_path = this.ftp('remote_path');     
     if(Object.keys(list).length){ 
         async.forEach(Object.keys(list),function(dir, next_array){
           ftp.mkdir(dir,true,function(err){             
@@ -145,8 +161,8 @@ module.exports = function(grunt){
   * Upload local file to server
   */ 
   Grunt_git_ftp_class.prototype.upload_files = function(list,cb){
-    var remote_root_path = App.ftp('remote_path'),
-    host = App.ftp('host');
+    var remote_root_path = this.ftp('remote_path'),
+    host = this.ftp('host');
     if(list.length){ 
         async.forEach(list,function(filepath, next_array){
           ftp.put(grunt_root_path + '/' + filepath,path.normalize(remote_root_path + '/' + filepath),function(err){
@@ -166,12 +182,14 @@ module.exports = function(grunt){
     }
   };
 
-  App = new Grunt_git_ftp_class();
 
+  /*
+  * Grunt Multi Task
+  */ 
   grunt.registerMultiTask('git_ftp','queries last git commit and FTPs modified files to server',function(){
-
+    var App = new Grunt_git_ftp_class(),
     //options with these defaults
-    var options = this.options({
+    options = this.options({
       'host_file':'.gitftppass',
       'host':'default'
     });

@@ -6,7 +6,7 @@ Node Packaged Modules for [Grunt](http://gruntjs.com).
 
 # Prerequisites
 
-- Grunt `~0.4.1`
+- Grunt `~0.4.1` (http://gruntjs.com/getting-started)
 - Node v0.10.5 (http://nodejs.org)
 - Git (http://git-scm.com)
 - FTP Server
@@ -51,7 +51,7 @@ git_ftp: {
   }
 }
 ```
-> .gitftppass configuration file
+> .gitftppass FTP Host configuration file
 
 ```js
 {
@@ -69,6 +69,6 @@ git_ftp: {
 
 Task submitted by [Roberto Carlos Marte](http://Carlosmarte.me/)
 
-> npm package grunt-git-ftp(https://npmjs.org/package/grunt-git-ftp)
+> Node Packaged Modules(https://npmjs.org/package/grunt-git-ftp)
 
-*This file was generated on Sun Jun 15 2013 11:00:31.*
+*This file was generated on Mon Jun 17 2013 08:40:00.*
