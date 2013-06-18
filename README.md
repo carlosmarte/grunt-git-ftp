@@ -24,6 +24,8 @@ _Run this task with the `grunt git_ftp` command._
 
 ### Usage Examples
 
+*Gruntfile.js
+
 ```js
 git_ftp: {
   development: {
@@ -40,10 +42,24 @@ git_ftp: {
   }
 }
 ```
+*.gitftppass configuration file
+
+```js
+{
+  "default": {
+      "host": "ftp.host-address.com",
+      "port": 21,
+      "user": "ftp-username",
+      "password": "ftp-account-password",
+      "remote_path": "ftp-basepath"
+  }
+}  
+```
 
 ---
 
 Task submitted by [Roberto Carlos Marte](http://Carlosmarte.me/)
-NPM Package grunt-git-ftp(https://npmjs.org/package/grunt-git-ftp)
+
+*npm package grunt-git-ftp(https://npmjs.org/package/grunt-git-ftp)
 
 *This file was generated on Sun Jun 15 2013 11:00:31.*
