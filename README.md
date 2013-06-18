@@ -61,6 +61,12 @@ git_ftp: {
       "user": "ftp-username",
       "password": "ftp-account-password",
       "remote_path": "ftp-basepath"
+  },"staging": {
+      "host": "ftp.host-address.com",
+      "port": 21,
+      "user": "ftp-username",
+      "password": "ftp-account-password",
+      "remote_path": "ftp-basepath"
   }
 }  
 ```
