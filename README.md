@@ -24,7 +24,7 @@ _Run this task with the `grunt git_ftp` command._
 
 ### Usage Examples
 
-*Gruntfile.js
+> Gruntfile.js
 
 ```js
 git_ftp: {
@@ -42,7 +42,7 @@ git_ftp: {
   }
 }
 ```
-*.gitftppass configuration file
+> .gitftppass configuration file
 
 ```js
 {
