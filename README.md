@@ -2,6 +2,15 @@ grunt-git-ftp
 =============
 > queries last git commit and FTPs modified files to server
 
+Node Packaged Modules for [Grunt](http://gruntjs.com). 
+
+# Prerequisites
+
+- Grunt `~0.4.1`
+- Node v0.10.5 (http://nodejs.org)
+- Git (http://git-scm.com)
+- FTP Server
+
 ## Getting Started
 This plugin requires Grunt `~0.4.1`
 
@@ -60,6 +69,6 @@ git_ftp: {
 
 Task submitted by [Roberto Carlos Marte](http://Carlosmarte.me/)
 
-*npm package grunt-git-ftp(https://npmjs.org/package/grunt-git-ftp)
+> npm package grunt-git-ftp(https://npmjs.org/package/grunt-git-ftp)
 
 *This file was generated on Sun Jun 15 2013 11:00:31.*
