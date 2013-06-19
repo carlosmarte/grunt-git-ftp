@@ -39,13 +39,13 @@ _Run this task with the `grunt git_ftp` command._
 git_ftp: {
   development: {
     options: {
-      'host_file':'.gitftppass',
+      'hostFile':'.gitftppass',
       'host':'staging'
     }
   },
   production: {
     options: {
-      'host_file':'.gitftppass',
+      'hostFile':'.gitftppass',
       'host':'default'
     }
   }
@@ -60,13 +60,13 @@ git_ftp: {
       "port": 21,
       "user": "ftp-username",
       "password": "ftp-account-password",
-      "remote_path": "ftp-basepath"
+      "remotePath": "ftp-basepath"
   },"staging": {
       "host": "ftp.host-address.com",
       "port": 21,
       "user": "ftp-username",
       "password": "ftp-account-password",
-      "remote_path": "ftp-basepath"
+      "remotePath": "ftp-basepath"
   }
 }  
 ```
