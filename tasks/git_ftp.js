@@ -10,11 +10,11 @@
 
 module.exports = function(grunt){
  //Extend array function, remove matching values from array
-  Array.prototype.remove = function(delete_matching_values){
+  Array.prototype.remove = function(deleteMatchingValues){
     var index = null; //store array index
-    //while loop through indexOf(delete_matching_values) values
+    //while loop through indexOf(deleteMatchingValues) values
     do{
-      index = this.indexOf(delete_matching_values); //return index of matching value
+      index = this.indexOf(deleteMatchingValues); //return index of matching value
       if(index > 0){  //if index if gt 0 remove
         this.splice(index, 1); //remove values from array
       }      
@@ -30,14 +30,14 @@ module.exports = function(grunt){
   file = grunt.file,
   fs = require('fs'),
   path = require('path'),
-  Ftp_client = require('ftp'),
+  FtpClient = require('ftp'),
   cmd = require("child_process").exec,
-  grunt_root_path = process.cwd(),
-  ftp = new Ftp_client(),
-  remote_directories = [],
+  gruntRootPath = process.cwd(),
+  ftp = new FtpClient(),
+  remoteDirectories = [],
   done = null,
-  Grunt_git_ftp_class = function(){  
-    this.host_config = null;
+  GruntGitFtp = function(){  
+    this.hostConfig = null; 
  
     return this;
   }; 
@@ -45,39 +45,39 @@ module.exports = function(grunt){
  /*
   * Get host file and parse json
   */  
-  Grunt_git_ftp_class.prototype.get_host_file = function(host_name,filename){  
+  GruntGitFtp.prototype.getHostFile = function(hostName,filename){  
     //check if file exist
     if(fs.existsSync(filename)){
       //check key value
-      if(host_name != null){        
-        this.host_config = grunt.file.readJSON(filename); 
-        this.host_config._key = host_name;
-        this.revision_number = null;
+      if(hostName != null){        
+        this.hostConfig = grunt.file.readJSON(filename); 
+        this.hostConfig._key = hostName;
+        this.revisionNumber = null;
         this.done = null,
-        this.local_directories = {},
-        this.local_files = null;
+        this.localDirectories = {},
+        this.localFiles = null;
       }else{
-        log.error('Error, please check {' + host_name.red + '} or json file format');
+        log.error('Error, please check {' + hostName.red + '} or json file format');
       }
     }else{
-        log.error('Error, ftp configuration file not found in : ' + grunt_root_path + '/' + filename.red);
+        log.error('Error, ftp configuration file not found in : ' + gruntRootPath + '/' + filename.red);
     }    
-    return this.host_config;
+    return this.hostConfig;
   };  
 
  /*
   * Get/Set FTP Key Values
   */  
-  Grunt_git_ftp_class.prototype.ftp = function(key,val){  
+  GruntGitFtp.prototype.ftp = function(key,val){  
     //if key isn't 
-    if(this.host_config._key === undefined || typeof(this.host_config[this.host_config._key]) !== 'object'){
+    if(this.hostConfig._key === undefined || typeof(this.hostConfig[this.hostConfig._key]) !== 'object'){
       log.error('Error, please check that { \n' + 
-      ' "'+ this.host_config._key.red +'": {  \n' + 
+      ' "'+ this.hostConfig._key.red +'": {  \n' + 
       '  "host": "ftp.host-address.com",  \n' + 
       '    "port": 21,  \n' + 
       '    "user": "ftp-username",  \n' + 
       '    "password": "ftp-account-password",  \n' + 
-      '    "remote_path": "ftp-basepath"  \n' + 
+      '    "remotePath": "ftp-basepath"  \n' + 
       '  }  \n' + 
       '} exist your ftp configuration file');
       throw 'key not found in .gitftppass'; 
@@ -85,37 +85,37 @@ module.exports = function(grunt){
 
     //get host config key
     if(arguments.length === 2){
-      this.host_config[this.host_config._key][key] = val;
+      this.hostConfig[this.hostConfig._key][key] = val;
     }
 
-    return (this.host_config[this.host_config._key][key] ? this.host_config[this.host_config._key][key] : null);
+    return (this.hostConfig[this.hostConfig._key][key] ? this.hostConfig[this.hostConfig._key][key] : null);
   };  
 
  /*
   * Command function return string
   */  
-  Grunt_git_ftp_class.prototype.cmd = function(command,cb,err){
+  GruntGitFtp.prototype.cmd = function(command,cb,err){
     this.commands(false,command,cb,err);
   }; 
 
  /*
   * Command function return array
   */  
-  Grunt_git_ftp_class.prototype.cmd_split = function(split,command,cb,err){
+  GruntGitFtp.prototype.cmdSplit = function(split,command,cb,err){
     this.commands(split,command,cb,err);
   }; 
 
  /*
   * Command wrapper function
   */  
-  Grunt_git_ftp_class.prototype.commands = function(should_split,command,cb,err){
+  GruntGitFtp.prototype.commands = function(shouldSplit,command,cb,err){
     cmd(command,function(error, stdout, stderr){ 
         var temp = null;     
         if(!error){
-          if(should_split === false){
+          if(shouldSplit === false){
             cb(stdout);
           }else{
-            temp = stdout.split(should_split).remove('');
+            temp = stdout.split(shouldSplit).remove('');
             cb(temp);
           }          
         }else{
@@ -127,7 +127,7 @@ module.exports = function(grunt){
  /*
   * report errors
   */  
-  Grunt_git_ftp_class.prototype.git_cmd_err = function(err){  
+  GruntGitFtp.prototype.gitCmdErr = function(err){  
     if(err.toString().indexOf('Needed a single revision')){
      log.error('Git Needed a single revision, please run'.red);
      log.ok('git add .'.red);
@@ -141,13 +141,13 @@ module.exports = function(grunt){
   /*
   * Create Remote Directory
   */  
-  Grunt_git_ftp_class.prototype.create_remote_directory = function(list,cb){
-    var remote_root_path = this.ftp('remote_path');     
+  GruntGitFtp.prototype.createRemoteDirectory = function(list,cb){
+    var remoteRootPath = this.ftp('remotePath');     
     if(Object.keys(list).length){ 
-        async.forEach(Object.keys(list),function(dir, next_array){
+        async.forEach(Object.keys(list),function(dir, nextArray){
           ftp.mkdir(dir,true,function(err){             
             log.ok('created remote directory: ' + dir);
-            next_array();           
+            nextArray();           
           });
         },function(err){
           cb(null);
@@ -160,19 +160,19 @@ module.exports = function(grunt){
   /*
   * Upload local file to server
   */ 
-  Grunt_git_ftp_class.prototype.upload_files = function(list,cb){
-    var remote_root_path = this.ftp('remote_path'),
+  GruntGitFtp.prototype.uploadFiles = function(list,cb){
+    var remoteRootPath = this.ftp('remotePath'),
     host = this.ftp('host');
     if(list.length){ 
-        async.forEach(list,function(filepath, next_array){
-          ftp.put(grunt_root_path + '/' + filepath,path.normalize(remote_root_path + '/' + filepath),function(err){
+        async.forEach(list,function(filepath, nextArray){
+          ftp.put(gruntRootPath + '/' + filepath,path.normalize(remoteRootPath + '/' + filepath),function(err){
             if(err){
               cb(true,err);
               throw err; 
             }      
-            log.ok('Uploaded from: ' + filepath + ' >> ' + host.blue + '@' + path.normalize(remote_root_path + '/' + filepath).green);     
+            log.ok('Uploaded from: ' + filepath + ' >> ' + host.blue + '@' + path.normalize(remoteRootPath + '/' + filepath).green);     
             ftp.end();
-            next_array();
+            nextArray();
           }); 
         },function(err){
           cb(null);
@@ -187,76 +187,76 @@ module.exports = function(grunt){
   * Grunt Multi Task
   */ 
   grunt.registerMultiTask('git_ftp','queries last git commit and FTPs modified files to server',function(){
-    var App = new Grunt_git_ftp_class(),
+    var gruntGitFtpApp = new GruntGitFtp(),
     //options with these defaults
     options = this.options({
-      'host_file':'.gitftppass',
+      'hostFile':'.gitftppass',
       'host':'default'
     });
 
     done = this.async();
 
     //get host file 
-    if(App.get_host_file(options.host,options.host_file) === null){
+    if(gruntGitFtpApp.getHostFile(options.host,options.hostFile) === null){
       //return if json file is not parse
       return this;
     }
 
     //login to FTP
     ftp.connect({
-        host: App.ftp('host'),
-        port: App.ftp('port'),
-        user: App.ftp('user'),
-        password: App.ftp('password')         
+        host: gruntGitFtpApp.ftp('host'),
+        port: gruntGitFtpApp.ftp('port'),
+        user: gruntGitFtpApp.ftp('user'),
+        password: gruntGitFtpApp.ftp('password')         
     });
 
     //FTP is ready
     ftp.on('ready',function(){
-        log.ok('Connected to ftp host: ' + App.ftp('host').blue + ' | root: ' + App.ftp('remote_path').blue );
+        log.ok('Connected to ftp host: ' + gruntGitFtpApp.ftp('host').blue + ' | root: ' + gruntGitFtpApp.ftp('remotePath').blue );
 
         //callbacks
         grunt.util.async.waterfall([
             function(callback){ //handles git commands
               //get last commited revision number
-              App.cmd('git rev-parse --verify HEAD',function(output){
-                //revision_number trim and toString
-                App.revision_number = output.toString(); 
+              gruntGitFtpApp.cmd('git rev-parse --verify HEAD',function(output){
+                //revisionNumber trim and toString
+                gruntGitFtpApp.revisionNumber = output.toString(); 
                 //check string length
-                if(App.revision_number.length !== 0){
+                if(gruntGitFtpApp.revisionNumber.length !== 0){
                   //notify user
-                  log.ok('git last commit HASH: ' + App.revision_number.blue);
+                  log.ok('git last commit HASH: ' + gruntGitFtpApp.revisionNumber.blue);
 
-                  App.cmd("git log --pretty=format:'%h' | wc -l",function(output){
-                    var total_revisions = parseInt(output,16);
+                  gruntGitFtpApp.cmd("git log --pretty=format:'%h' | wc -l",function(output){
+                    var totalRevisions = parseInt(output,16);
                     //if first commit upload all files
-                    if(total_revisions === 0){
+                    if(totalRevisions === 0){
                       //get list of commited files/directories
-                      App.cmd_split(/\n/,'git show --pretty="format:" --name-only ' + App.revision_number,function(output){  
+                      gruntGitFtpApp.cmdSplit(/\n/,'git show --pretty="format:" --name-only ' + gruntGitFtpApp.revisionNumber,function(output){  
                         //check output length
                         if(output.length !== 0){
                           //Get List of commited items
-                          App.last_commited_items = output;              
+                          gruntGitFtpApp.lastCommitedItems = output;              
                           //next callback
-                          callback(null,App.last_commited_items); 
+                          callback(null,gruntGitFtpApp.lastCommitedItems); 
                         }else{
                           log.error('Error while getting Git Commited items');
                           callback(true);
                         }
-                      },App.git_cmd_err); 
+                      },gruntGitFtpApp.gitCmdErr); 
                     }else{ //else only upload changes files
                       //get list of commited files/directories
-                      App.cmd_split(/\n/,'git diff-tree --no-commit-id --name-only -r ' + App.revision_number,function(output){  
+                      gruntGitFtpApp.cmdSplit(/\n/,'git diff-tree --no-commit-id --name-only -r ' + gruntGitFtpApp.revisionNumber,function(output){  
                         //check output length
                         if(output.length !== 0){
                           //Get List of commited items
-                          App.last_commited_items = output;              
+                          gruntGitFtpApp.lastCommitedItems = output;              
                           //next callback
-                          callback(null,App.last_commited_items); 
+                          callback(null,gruntGitFtpApp.lastCommitedItems); 
                         }else{
                           log.error('Error while getting Git Commited items');
                           callback(true);
                         }
-                      },App.git_cmd_err); 
+                      },gruntGitFtpApp.gitCmdErr); 
                     }
                   });
 
@@ -264,33 +264,33 @@ module.exports = function(grunt){
                   log.error('Error while getting Git Commit Hash');
                   callback(true);
                 }
-              },App.git_cmd_err);
-            },function(arg_last_commited,callback){ //handles filtering files/directories
+              },gruntGitFtpApp.gitCmdErr);
+            },function(argLastCommited,callback){ //handles filtering files/directories
               var relative_path = null,
-              remote_root_path = App.ftp('remote_path'); //get remote path from .gitftppass   
+              remoteRootPath = gruntGitFtpApp.ftp('remotePath'); //get remote path from .gitftppass   
 
-              if(remote_root_path.length === 0){
+              if(remoteRootPath.length === 0){
                 log.error('Error, please check {remote path} in .gitftppass');
                 return callback(true);
               }  
 
               //filter array and return remote filepath
-              App.local_files = arg_last_commited.filter(function(filepath){
-                if(fs.existsSync(grunt_root_path + '/' + filepath)){ 
+              gruntGitFtpApp.localFiles = argLastCommited.filter(function(filepath){
+                if(fs.existsSync(gruntRootPath + '/' + filepath)){ 
                   //store directory as a key(path) value(successfully uploaded)
-                  App.local_directories[path.normalize(path.dirname(remote_root_path + '/' + filepath) + '/')] = null;
+                  gruntGitFtpApp.localDirectories[path.normalize(path.dirname(remoteRootPath + '/' + filepath) + '/')] = null;
                   //only return file OR files that start with (.)
                   return (path.extname(filepath) || filepath[0] === '.' ? true : false);
                 }else{
                   return false;
                 }
               });               
-              callback(null,App);                
+              callback(null,gruntGitFtpApp);                
             },function(IO,callback){ //handles filtering files/directories
               //Create Remote Directories
-              App.create_remote_directory(IO.local_directories,function(){
-                App.upload_files(IO.local_files,function(){
-                  callback(null,'Successfully uploaded ' + String(IO.local_files.length).blue + ' files from last committed id:' + App.revision_number.blue);
+              gruntGitFtpApp.createRemoteDirectory(IO.localDirectories,function(){
+                gruntGitFtpApp.uploadFiles(IO.localFiles,function(){
+                  callback(null,'Successfully uploaded ' + String(IO.localFiles.length).blue + ' files from last committed id:' + gruntGitFtpApp.revisionNumber.blue);
                 });                
               });             
             }],function(err,result){ //Completed
