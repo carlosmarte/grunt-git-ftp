@@ -212,6 +212,12 @@ module.exports = function(grunt){
 
     //FTP is ready
     ftp.on('ready',function(){
+     
+     	 if (!gruntGitFtpApp.ftp('remotePath')) {
+			      log.error('remote path cannot be NULL, use a "/" instead');
+			      process.exit(1);
+		     }
+     
         log.ok('Connected to ftp host: ' + gruntGitFtpApp.ftp('host').blue + ' | root: ' + gruntGitFtpApp.ftp('remotePath').blue );
 
         //callbacks
