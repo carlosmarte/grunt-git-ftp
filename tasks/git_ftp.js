@@ -225,7 +225,11 @@ module.exports = function(grunt){
               //get last commited revision number
               gruntGitFtpApp.cmd('git rev-parse --verify HEAD',function(output){
                 //revisionNumber trim and toString
-                gruntGitFtpApp.revisionNumber = output.toString(); 
+                if (grunt.option('commit')) {
+					gruntGitFtpApp.revisionNumber = grunt.option('commit'); 
+				} else {	
+					gruntGitFtpApp.revisionNumber = output.toString(); 
+				}
                 //check string length
                 if(gruntGitFtpApp.revisionNumber.length !== 0){
                   //notify user
