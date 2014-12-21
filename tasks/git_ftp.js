@@ -195,6 +195,11 @@ module.exports = function(grunt){
     });
 
     done = this.async();
+	
+	//get all ignored files
+	if (options.ignore) {
+		gruntGitFtpApp.ignoredFiles = grunt.file.expand(options.ignore);
+	}
 
     //get host file 
     if(gruntGitFtpApp.getHostFile(options.host,options.hostFile) === null){
@@ -220,7 +225,11 @@ module.exports = function(grunt){
               //get last commited revision number
               gruntGitFtpApp.cmd('git rev-parse --verify HEAD',function(output){
                 //revisionNumber trim and toString
-                gruntGitFtpApp.revisionNumber = output.toString(); 
+                if (grunt.option('commit')) {
+					gruntGitFtpApp.revisionNumber = grunt.option('commit'); 
+				} else {	
+					gruntGitFtpApp.revisionNumber = output.toString(); 
+				}
                 //check string length
                 if(gruntGitFtpApp.revisionNumber.length !== 0){
                   //notify user
@@ -277,6 +286,10 @@ module.exports = function(grunt){
               //filter array and return remote filepath
               gruntGitFtpApp.localFiles = argLastCommited.filter(function(filepath){
                 if(fs.existsSync(gruntRootPath + '/' + filepath)){ 
+					//skip ignored
+					if (gruntGitFtpApp.ignoredFiles && gruntGitFtpApp.ignoredFiles.indexOf(filepath) > -1) {
+						return false;
+					}
                   //store directory as a key(path) value(successfully uploaded)
                   gruntGitFtpApp.localDirectories[path.normalize(path.dirname(remoteRootPath + '/' + filepath) + '/')] = null;
                   //only return file OR files that start with (.)
