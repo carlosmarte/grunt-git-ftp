@@ -31,17 +31,20 @@
   "dependencies": {
     "ftp": "~0.3.1",
     "grunt": "~0.4.1"
-  }, 
+  },
   "devDependencies": {
     "grunt-contrib-jshint": "~0.1.1",
     "grunt-contrib-nodeunit": "~0.1.2",
-    "grunt-contrib-watch":"~0.4.4"
+    "grunt-contrib-watch": "~0.4.4"
   },
   "peerDependencies": {
-    "grunt": "~0.4.1",
-    "ftp":"~0.3.1"
+    "grunt": ">=0.4.0",
+    "ftp": "~0.3.1"
   },
   "keywords": [
-    "gruntplugin","git","ftp","last commit"
+    "gruntplugin",
+    "git",
+    "ftp",
+    "last commit"
   ]
 }
